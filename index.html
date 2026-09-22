@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ruta de Implementación BIDA</title>
+<style>
+  :root{
+    --bg:#FAF7F1;
+    --surface:#FFFFFF;
+    --ink:#2A2723;
+    --muted:#7A7266;
+    --line:#E4DCCC;
+    --navy:#1F3A5F;
+    --navy-soft:#E8EEF4;
+    --gold:#A87F3F;
+    --gold-soft:#F4ECDC;
+    --amber:#A65B23;
+    --amber-soft:#F6E6D5;
+    --green:#2E6B4C;
+    --green-soft:#E4EFE7;
+    --shadow: 0 1px 2px rgba(42,39,35,.04), 0 8px 24px rgba(42,39,35,.06);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#181613;
+      --surface:#221F1B;
+      --ink:#EDE7DA;
+      --muted:#A79E8C;
+      --line:#3A362E;
+      --navy:#89ADD9;
+      --navy-soft:#25344A;
+      --gold:#D9B77B;
+      --gold-soft:#3A311F;
+      --amber:#E39A5C;
+      --amber-soft:#3C2A18;
+      --green:#7FC3A0;
+      --green-soft:#1E3327;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 28px rgba(0,0,0,.35);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#181613;
+    --surface:#221F1B;
+    --ink:#EDE7DA;
+    --muted:#A79E8C;
+    --line:#3A362E;
+    --navy:#89ADD9;
+    --navy-soft:#25344A;
+    --gold:#D9B77B;
+    --gold-soft:#3A311F;
+    --amber:#E39A5C;
+    --amber-soft:#3C2A18;
+    --green:#7FC3A0;
+    --green-soft:#1E3327;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 28px rgba(0,0,0,.35);
+    color-scheme: dark;
+  }
+
+  *{box-sizing:border-box;}
+  body{background:var(--bg); color:var(--ink); margin:0;}
+  .page{
+    max-width:840px; margin:0 auto; padding:40px 20px 64px;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  h1,h2,.display{ font-family:"Fraunces", Georgia, serif; }
+  .mono{ font-family:"IBM Plex Mono", ui-monospace, monospace; font-variant-numeric:tabular-nums; }
+
+  header.hero{ margin-bottom:44px; }
+  .brand-logo{ height:26px; width:auto; display:block; margin-bottom:22px; }
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:"IBM Plex Mono",monospace; font-size:11.5px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--gold); font-weight:600; margin-bottom:14px;
+  }
+  .eyebrow::before{ content:""; width:18px; height:1px; background:var(--gold); display:inline-block; }
+  h1{ font-size:clamp(28px,4.6vw,40px); font-weight:600; line-height:1.15; margin:0 0 10px; color:var(--ink); text-wrap:balance; }
+  .lede{ font-size:16px; line-height:1.6; color:var(--muted); max-width:60ch; margin:0; }
+
+  .legend{
+    display:flex; flex-wrap:wrap; gap:18px; margin-top:26px; padding-top:20px; border-top:1px solid var(--line);
+  }
+  .legend-item{ display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--muted); }
+  .dot{ width:9px; height:9px; border-radius:50%; flex:none; }
+
+  .timeline{ position:relative; padding-left:58px; }
+  .rail{ position:absolute; left:23px; top:6px; bottom:34px; width:2px; background:var(--line); }
+
+  .stage{ position:relative; margin-bottom:22px; }
+  .node{
+    position:absolute; left:-58px; top:2px; width:46px; height:46px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; background:var(--surface);
+    border:2px solid var(--navy); color:var(--navy); font-family:"IBM Plex Mono",monospace; font-weight:600; font-size:14px;
+    box-shadow:var(--shadow);
+  }
+  .stage.gate .node{ border-color:var(--amber); color:var(--amber); }
+  .stage.adopt .node{ border-color:var(--green); color:var(--green); }
+
+  .card{
+    background:var(--surface); border:1px solid var(--line); border-radius:14px;
+    padding:18px 20px; cursor:pointer; box-shadow:var(--shadow); transition:border-color .15s ease;
+  }
+  .card:hover{ border-color:var(--gold); }
+  .card-top{ display:flex; align-items:flex-start; justify-content:space-between; gap:14px; }
+  .card-title-wrap{ min-width:0; }
+  .kicker{
+    display:inline-block; font-family:"IBM Plex Mono",monospace; font-size:10.5px; letter-spacing:.1em;
+    text-transform:uppercase; padding:3px 8px; border-radius:999px; margin-bottom:8px; font-weight:600;
+  }
+  .stage.gate .kicker{ background:var(--amber-soft); color:var(--amber); }
+  .stage.adopt .kicker{ background:var(--green-soft); color:var(--green); }
+  .card-title{ font-family:"Fraunces",serif; font-size:19px; font-weight:600; margin:0 0 4px; color:var(--ink); }
+  .card-obj{ font-size:14px; color:var(--muted); margin:0; line-height:1.5; }
+  .chev{ flex:none; width:22px; height:22px; color:var(--muted); transition:transform .2s ease; margin-top:2px; }
+  .card.open .chev{ transform:rotate(180deg); }
+
+  .card-body{
+    display:grid; grid-template-rows:0fr; transition:grid-template-rows .22s ease;
+  }
+  .card.open .card-body{ grid-template-rows:1fr; }
+  .card-body-inner{ overflow:hidden; }
+  .card.open .card-body-inner{ padding-top:14px; margin-top:14px; border-top:1px solid var(--line); }
+
+  .deliv-label{ font-family:"IBM Plex Mono",monospace; font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin:0 0 8px; }
+  ul.deliv{ margin:0 0 14px; padding-left:18px; }
+  ul.deliv li{ font-size:13.5px; line-height:1.55; margin-bottom:4px; color:var(--ink); }
+  .fuente{
+    font-size:12.5px; line-height:1.5; color:var(--muted); background:var(--gold-soft);
+    border-radius:8px; padding:9px 12px; border-left:3px solid var(--gold);
+  }
+  .fuente b{ color:var(--ink); font-weight:600; }
+
+  .loop{
+    margin-top:8px; margin-left:2px; display:flex; gap:14px; align-items:flex-start;
+    background:var(--navy-soft); border-radius:14px; padding:18px 20px;
+  }
+  .loop svg{ flex:none; width:26px; height:26px; color:var(--navy); margin-top:2px; }
+  .loop p{ margin:0; font-size:13.5px; line-height:1.6; color:var(--ink); }
+  .loop b{ color:var(--navy); }
+
+  footer{ margin-top:40px; padding-top:20px; border-top:1px solid var(--line); display:flex; flex-wrap:wrap; gap:8px 16px; justify-content:space-between; }
+  footer p{ margin:0; font-size:12px; color:var(--muted); }
+
+  @media (max-width:480px){
+    .timeline{ padding-left:46px; }
+    .rail{ left:17px; }
+    .node{ left:-46px; width:36px; height:36px; font-size:12px; }
+    .card{ padding:15px 16px; }
+    .card-title{ font-size:17px; }
+  }
+</style>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="page">
+  <header class="hero">
+    <img class="brand-logo" alt="Bida Global 21, C.A." src="data:image/png;base64,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">
+    <div class="eyebrow">Bida Global 21, C.A.</div>
+    <h1>Ruta de implementación de IA con Claude</h1>
+    <p class="lede">Las ocho etapas del estándar BIDA, validadas contra la documentación oficial de Anthropic y Google, y contra los marcos de Gartner, McKinsey y Harvard Business Review. Toca cada etapa para ver sus entregables.</p>
+    <div class="legend">
+      <div class="legend-item"><span class="dot" style="background:var(--navy)"></span>Etapa del estándar</div>
+      <div class="legend-item"><span class="dot" style="background:var(--amber)"></span>Punto de control de aprobación</div>
+      <div class="legend-item"><span class="dot" style="background:var(--green)"></span>Adopción · Centro de Excelencia</div>
+    </div>
+  </header>
+
+  <main>
+    <div class="timeline" id="timeline">
+      <div class="rail"></div>
+    </div>
+
+    <div class="loop">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 1 3.5 7.1"/><path d="M3 17v-5h5"/></svg>
+      <p><b>La Etapa 7 cierra el bucle:</b> el panel de recurrencia y el backlog priorizado alimentan un nuevo Diagnóstico CAIO (Etapa 1) para el siguiente proceso de la empresa. Es el mismo estándar, aplicado de nuevo — no un proyecto distinto.</p>
+    </div>
+  </main>
+
+  <footer>
+    <p>Bida Global 21, C.A. — documento vivo, v1.0 — 22 de septiembre de 2026</p>
+    <p>Fuentes completas y desarrollo de cada etapa en el documento maestro del estándar</p>
+  </footer>
+</div>
+
+<script>
+(function(){
+  var stages = [
+    { n:"0", kind:"", title:"Encuadre y Preparación", obj:"Mandato, alcance de negocio y datos suficientes antes de comprometer recursos.",
+      deliv:["Carta de mandato firmada por el patrocinador ejecutivo","Alcance y objetivo de negocio documentado","Evaluación de preparación organizacional y de datos","Matriz de priorización de procesos candidatos","Métrica de valor definida desde el inicio"],
+      fuente:"Anthropic — primera etapa (Personas y Proceso) · Marco de Adopción de IA de Google Cloud · Gartner (evaluación multidimensional)" },
+    { n:"1", kind:"", title:"Diagnóstico CAIO", obj:"Qué proceso está roto: dónde se pierde información, dónde se repite trabajo y dónde el proceso opera en bucle abierto.",
+      deliv:["Informe de diagnóstico CAIO por área","Mapa de dolor por proceso, con evidencia cuantitativa","Lista priorizada de oportunidades"],
+      fuente:"Anthropic — segunda etapa (crear valor de negocio) · McKinsey (priorización anclada a valor)" },
+    { n:"2", kind:"", title:"Mapa de Bucle", obj:"Cómo funciona hoy el proceso y cómo debe funcionar después: qué entra, qué se mide, quién decide, quién controla.",
+      deliv:["Diagrama del proceso actual (estado presente)","Diagrama del proceso deseado (estado futuro) con IA integrada","Indicadores clave de control del bucle cerrado"],
+      fuente:"Anthropic — segunda etapa (selección de modelo Claude) · Marco de Adopción de IA de Google Cloud, frente de automatización" },
+    { n:"3", kind:"", title:"PRD", obj:"Qué se va a requerir, qué sistema se va a instalar, qué problema resuelve y qué funciones necesita.",
+      deliv:["PRD formal con alcance funcional","Especificación técnica de integración","Criterios de aceptación medibles"],
+      fuente:"Anthropic — tercera etapa (construir para producción) · ficha de mejores prácticas de Anthropic (Planificación, Redacción de instrucciones, Evaluación, Optimización)" },
+    { n:"4", kind:"gate", tag:"Punto de control de aprobación", title:"Marco de Riesgo, Ética y Seguridad", obj:"Punto de control formal antes de implementar: privacidad, sesgos, accesos, cumplimiento y firma de aprobación del patrocinador.",
+      deliv:["Matriz de riesgo con plan de mitigación","Lista de verificación de cumplimiento y seguridad","Acta de aprobación del patrocinador"],
+      fuente:"Anthropic — criterios de graduación de piloto (desempeño, preparación operativa, infraestructura de riesgo) · Gartner — 6 pilares de gobernanza" },
+    { n:"5", kind:"", title:"Plan de Implementación", obj:"Qué se instala primero, qué se valida, qué depende de qué y qué accesos se necesitan.",
+      deliv:["Cronograma con dependencias explícitas","Lista de verificación técnica: inicio de sesión único, aprovisionamiento de usuarios, roles, conectores","Plan de pruebas antes del lanzamiento"],
+      fuente:"Guía de Administrador Empresarial de Claude — primera fase (configuración técnica) · Anthropic, cuarta etapa (despliegue)" },
+    { n:"6", kind:"adopt", tag:"Centro de Excelencia", title:"Plan de Adopción", obj:"Que el equipo use la herramienta y exista un responsable interno permanente.",
+      deliv:["Plan de gestión del cambio y comunicación","Red de \"campeones\" por departamento","Calendario de capacitación (introductoria, por área, horas de consulta abierta)","Definición del Centro de Excelencia y su responsable"],
+      fuente:"Guía de Administrador Empresarial de Claude — gestión del cambio y capacitación · guía de transformación de Google Workspace · curso oficial de adopción empresarial de Claude" },
+    { n:"7", kind:"adopt", tag:"Centro de Excelencia", title:"Plan de Recurrencia", obj:"Cerrar el primer bucle: cómo se mantiene, cómo se mide y cuál es el siguiente proceso a mejorar.",
+      deliv:["Panel de métricas de recurrencia y adopción","Calendario de revisión periódica con el cliente","Lista priorizada de siguientes procesos a intervenir"],
+      fuente:"Curso oficial de adopción empresarial de Claude (Aceleración/Expansión) · Google Workspace (fase de transformación) · McKinsey (habilitadores técnicos de escala)" }
+  ];
+
+  var wrap = document.getElementById("timeline");
+  stages.forEach(function(s, i){
+    var el = document.createElement("div");
+    el.className = "stage" + (s.kind ? " " + s.kind : "");
+    var delivHtml = s.deliv.map(function(d){ return "<li>"+d+"</li>"; }).join("");
+    el.innerHTML =
+      '<div class="node mono">'+ s.n +'</div>' +
+      '<div class="card" role="button" tabindex="0" aria-expanded="false">' +
+        '<div class="card-top">' +
+          '<div class="card-title-wrap">' +
+            (s.tag ? '<span class="kicker">'+s.tag+'</span>' : '') +
+            '<p class="card-title">'+ (s.n === "0" ? "Fase 0 — " : "Etapa "+s.n+" — ") + s.title +'</p>' +
+            '<p class="card-obj">'+ s.obj +'</p>' +
+          '</div>' +
+          '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>' +
+        '</div>' +
+        '<div class="card-body"><div class="card-body-inner">' +
+          '<p class="deliv-label">Entregables Bida</p>' +
+          '<ul class="deliv">'+ delivHtml +'</ul>' +
+          '<div class="fuente"><b>Fundamento:</b> '+ s.fuente +'</div>' +
+        '</div></div>' +
+      '</div>';
+    wrap.appendChild(el);
+
+    var card = el.querySelector(".card");
+    function toggle(){
+      var open = card.classList.toggle("open");
+      card.setAttribute("aria-expanded", open ? "true" : "false");
+    }
+    card.addEventListener("click", toggle);
+    card.addEventListener("keydown", function(e){
+      if(e.key === "Enter" || e.key === " "){ e.preventDefault(); toggle(); }
+    });
+  });
+})();
+</script>
+</body>
+</html>
